@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NLP Pipeline Animation - Care Bears Review</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .slide {
+        display: none;
+        padding: 60px;
+        min-height: 600px;
+        animation: slideIn 0.5s ease-out;
+      }
+
+      .slide.active {
+        display: block;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .slide-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .slide-number {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .slide-title {
+        font-size: 36px;
+        color: #2d3748;
+        margin-bottom: 10px;
+      }
+
+      .slide-subtitle {
+        font-size: 18px;
+        color: #718096;
+      }
+
+      .content-box {
+        background: #f7fafc;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px 0;
+        border-left: 5px solid #667eea;
+        position: relative;
+      }
+
+      .data-flow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 30px 0;
+        flex-wrap: wrap;
+      }
+
+      .data-box {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        flex: 1;
+        margin: 10px;
+        min-width: 200px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .data-label {
+        font-size: 12px;
+        color: #667eea;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .data-content {
+        font-size: 16px;
+        color: #2d3748;
+        line-height: 1.6;
+      }
+
+      .arrow {
+        font-size: 40px;
+        color: #667eea;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.7;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 1;
+        }
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 60px;
+        background: #f7fafc;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+      }
+
+      .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .progress-bar {
+        flex: 1;
+        margin: 0 30px;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s ease;
+      }
+
+      .code-box {
+        background: #2d3748;
+        color: #68d391;
+        padding: 20px;
+        border-radius: 10px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        overflow-x: auto;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .highlight {
+        background: rgba(252, 129, 129, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+        color: #fc8181;
+      }
+
+      .highlight-green {
+        background: rgba(104, 211, 145, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+        color: #68d391;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .badge-success {
+        background: #c6f6d5;
+        color: #22543d;
+      }
+
+      .badge-info {
+        background: #bee3f8;
+        color: #2c5282;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .stat-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        animation: fadeInUp 1s ease-out;
+      }
+
+      .stat-value {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 5px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #718096;
+      }
+
+      .pipeline-visual {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 30px 0;
+      }
+
+      .pipeline-step {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        animation: slideInLeft 0.6s ease-out;
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .step-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .step-content {
+        flex: 1;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 15px 20px;
+      }
+
+      .step-name {
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+
+      .step-description {
+        font-size: 14px;
+        color: #718096;
+      }
+
+      /* Ensure the intro layout is only shown when the slide is active.
+         Some browsers or CSS ordering could cause `.intro-slide` to override
+         `.slide { display: none; }`. Hide `.intro-slide` by default and only
+         reveal it when the containing `.slide` also has `.active`. */
+      .intro-slide {
+        text-align: center;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .slide.active.intro-slide {
+        display: flex;
+      }
+
+      .intro-icon {
+        font-size: 100px;
+        margin-bottom: 30px;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .intro-title {
+        font-size: 48px;
+        color: #2d3748;
+        margin-bottom: 20px;
+      }
+
+      .intro-description {
+        font-size: 20px;
+        color: #718096;
+        max-width: 700px;
+        margin-bottom: 40px;
+      }
+
+      .word-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 15px;
+      }
+
+      .word-tag {
+        background: white;
+        border: 2px solid #e2e8f0;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #2d3748;
+      }
+
+      .word-tag.removed {
+        background: #fed7d7;
+        border-color: #fc8181;
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Slide 0: Introduction -->
+      <div class="slide active intro-slide">
+        <div class="intro-icon">🐻</div>
+        <h1 class="intro-title">NLP Sentiment Analysis Pipeline</h1>
+        <p class="intro-description">
+          Let's track a Care Bears movie review through preprocessing, feature
+          extraction, model training, and prediction!
+        </p>
+        <div class="content-box" style="text-align: left; max-width: 900px">
+          <h3 style="margin-bottom: 20px; color: #667eea">
+            📊 Our Sample Review
+          </h3>
+          <div class="data-content" style="font-size: 14px; line-height: 1.8">
+            <p><strong>Review Text:</strong></p>
+            <p style="margin-top: 10px; font-style: italic">
+              "Care Bears Movie 2: A New Generation isn't at all a bad movie. In
+              fact, I like it very much. Yes I admit the dialogue is corny and
+              the story is a bit poorly told at times. But Darkheart, while very
+              very dark is a convincing enough shape shifting villain, and
+              Hadley Kay did a superb job voicing him. Speaking of the voice
+              acting, it was great, nothing wrong with it whatsoever. The
+              animation is colourful, and some of the visuals particularly at
+              the beginning were breathtaking. The songs and score are lovely,
+              especially Growing Up and Forever Young..."
+            </p>
+            <p style="margin-top: 15px">
+              <strong>True Sentiment:</strong>
+              <span class="badge badge-success">POSITIVE</span>
+            </p>
+            <p style="margin-top: 10px"><strong>Score:</strong> 8/10</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 1: Raw Data -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 1 of 20</div>
+          <h2 class="slide-title">📄 Raw Data Input</h2>
+          <p class="slide-subtitle">Starting with the unprocessed review</p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">CSV Reader Output</h3>
+          <div class="code-box">
+            RowID: Row15<br />
+            Index: 2847<br />
+            URL: http://www.imdb.com/title/tt0090152/usercomm<br />
+            Text: "Care Bears Movie 2: A New Generation isn't at all a bad
+            movie..."<br />
+            Sentiment: POS<br />
+            Rating: 8/10
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">What happens here?</div>
+          <div class="data-content">
+            The system reads this review along with 1,999 others from a CSV
+            file. Each review contains the full text and its sentiment label
+            (POS or NEG).
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Strings to Document -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 2 of 20</div>
+          <h2 class="slide-title">📝 Strings to Document</h2>
+          <p class="slide-subtitle">Converting text into a structured format</p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">INPUT</div>
+            <div class="data-content" style="font-size: 13px">
+              "Care Bears Movie 2: A New Generation isn't at all a bad movie. In
+              fact, I like it very much..."
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">OUTPUT</div>
+            <div class="data-content">
+              Document Object<br /><span style="font-size: 12px; color: #718096"
+                >(Structured text ready for NLP processing)</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Why this matters</div>
+          <div class="data-content">
+            Raw strings need to be converted into document objects that NLP
+            tools can tokenize, analyze, and process systematically.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Punctuation Erasure -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 3 of 20</div>
+          <h2 class="slide-title">🧹 Punctuation Erasure</h2>
+          <p class="slide-subtitle">Removing punctuation marks</p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">BEFORE</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie <span class="highlight">2:</span> A New
+              Generation <span class="highlight">isn't</span> at all a bad
+              movie<span class="highlight">.</span> In fact<span
+                class="highlight"
+                >,</span
+              >
+              I like it very much<span class="highlight">.</span>
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">AFTER</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie 2 A New Generation isnt at all a bad movie In
+              fact I like it very much
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">Removed Characters:</h3>
+          <div class="word-list">
+            <span class="word-tag removed">.</span>
+            <span class="word-tag removed">,</span>
+            <span class="word-tag removed">:</span>
+            <span class="word-tag removed">'</span>
+            <span class="word-tag removed">!</span>
+            <span class="word-tag removed">?</span>
+          </div>
+          <p style="margin-top: 20px; color: #718096">
+            Punctuation doesn't usually carry sentiment meaning and adds noise
+            to our analysis.
+          </p>
+        </div>
+      </div>
+
+      <!-- Slide 4: Number Filter -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 4 of 20</div>
+          <h2 class="slide-title">🔢 Number Filter</h2>
+          <p class="slide-subtitle">Removing numeric characters</p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">BEFORE</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie <span class="highlight">2</span> A New Generation
+              isnt at all a bad movie...
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">AFTER</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie A New Generation isnt at all a bad movie...
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Why remove numbers?</div>
+          <div class="data-content">
+            Numbers like "2" or "8/10" don't help distinguish sentiment. The
+            model focuses on words that express opinions like "great", "bad",
+            "superb", etc.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: N Chars Filter -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 5 of 20</div>
+          <h2 class="slide-title">📏 N Chars Filter</h2>
+          <p class="slide-subtitle">Removing very short words</p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">BEFORE</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie <span class="highlight">A</span> New Generation
+              isnt <span class="highlight">at</span> all
+              <span class="highlight">a</span> bad movie
+              <span class="highlight">In</span> fact
+              <span class="highlight">I</span> like
+              <span class="highlight">it</span> very much
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">AFTER</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie New Generation isnt all bad movie fact like very
+              much
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">Removed Words (< 3 characters):</h3>
+          <div class="word-list">
+            <span class="word-tag removed">A</span>
+            <span class="word-tag removed">at</span>
+            <span class="word-tag removed">a</span>
+            <span class="word-tag removed">In</span>
+            <span class="word-tag removed">I</span>
+            <span class="word-tag removed">it</span>
+          </div>
+          <p style="margin-top: 20px; color: #718096">
+            Very short words are often articles or pronouns that don't carry
+            sentiment information.
+          </p>
+        </div>
+      </div>
+
+      <!-- Slide 6: Stop Word Filter -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 6 of 20</div>
+          <h2 class="slide-title">🚫 Stop Word Filter</h2>
+          <p class="slide-subtitle">
+            Removing common words without sentiment meaning
+          </p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">BEFORE</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie New Generation
+              <span class="highlight">isnt</span>
+              <span class="highlight">all</span> bad movie fact like
+              <span class="highlight">very</span>
+              <span class="highlight">much</span>
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">AFTER</div>
+            <div class="data-content" style="font-size: 13px">
+              Care Bears Movie New Generation bad movie fact like
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">Stop Words Removed:</h3>
+          <div class="word-list">
+            <span class="word-tag removed">isnt</span>
+            <span class="word-tag removed">all</span>
+            <span class="word-tag removed">very</span>
+            <span class="word-tag removed">much</span>
+            <span class="word-tag removed">the</span>
+            <span class="word-tag removed">and</span>
+            <span class="word-tag removed">but</span>
+            <span class="word-tag removed">while</span>
+          </div>
+          <p style="margin-top: 20px; color: #718096">
+            Stop words appear frequently but don't help distinguish positive
+            from negative reviews.
+          </p>
+        </div>
+      </div>
+
+      <!-- Slide 7: Case Converter -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 7 of 20</div>
+          <h2 class="slide-title">🔡 Case Converter</h2>
+          <p class="slide-subtitle">Converting all text to lowercase</p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">BEFORE</div>
+            <div class="data-content" style="font-size: 13px">
+              <span class="highlight">Care Bears Movie New Generation</span> bad
+              movie fact like dialogue corny story poorly told
+              <span class="highlight">Darkheart</span> dark convincing
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">AFTER</div>
+            <div class="data-content" style="font-size: 13px">
+              care bears movie new generation bad movie fact like dialogue corny
+              story poorly told darkheart dark convincing
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Why lowercase?</div>
+          <div class="data-content">
+            Standardizing case ensures "Movie", "movie", and "MOVIE" are treated
+            as the same word. This reduces vocabulary size and improves model
+            efficiency.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Snowball Stemmer -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 8 of 20</div>
+          <h2 class="slide-title">✂️ Snowball Stemmer</h2>
+          <p class="slide-subtitle">Reducing words to their root form</p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">Stemming Examples:</h3>
+          <div class="pipeline-visual">
+            <div class="pipeline-step">
+              <div class="step-icon">1</div>
+              <div class="step-content">
+                <div class="step-name">convincing → convinc</div>
+                <div class="step-description">Remove "-ing" suffix</div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">2</div>
+              <div class="step-content">
+                <div class="step-name">shifting → shift</div>
+                <div class="step-description">Remove "-ing" suffix</div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">3</div>
+              <div class="step-content">
+                <div class="step-name">lovely → love</div>
+                <div class="step-description">Remove "-ly" suffix</div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">4</div>
+              <div class="step-content">
+                <div class="step-name">breathtaking → breathtak</div>
+                <div class="step-description">Remove "-ing" suffix</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">After Stemming:</h3>
+          <div class="code-box">
+            care bear movi new generat bad movi fact like dialogu corni stori<br />
+            poorli told darkheart dark convinc shift villain hadley kay
+            superb<br />
+            job voic speak voic act great wrong whatsoev anim colour visual<br />
+            particular begin breathtak song score love grow forev young
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 9: Bag of Words Creator -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 9 of 20</div>
+          <h2 class="slide-title">🎒 Bag of Words Creator</h2>
+          <p class="slide-subtitle">Counting word frequencies</p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">Word Frequency Count</h3>
+          <div class="code-box">
+            movi: 2 (appears twice)<br />
+            voic: 2 (appears twice)<br />
+            care: 1<br />
+            bear: 1<br />
+            new: 1<br />
+            generat: 1<br />
+            bad: 1<br />
+            fact: 1<br />
+            like: 1<br />
+            dialogu: 1<br />
+            corni: 1<br />
+            stori: 1<br />
+            poorli: 1<br />
+            told: 1<br />
+            darkheart: 1<br />
+            dark: 1<br />
+            convinc: 1<br />
+            superb: 1<br />
+            great: 1<br />
+            love: 1<br />
+            breathtak: 1<br />
+            ...and more
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Understanding Bag of Words</div>
+          <div class="data-content">
+            We count how many times each word appears. Notice positive words
+            like "superb", "great", "love", and "breathtak" appear frequently -
+            these signal positive sentiment!
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 10: Term to String & GroupBy -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 10 of 20</div>
+          <h2 class="slide-title">🔤 Term Processing</h2>
+          <p class="slide-subtitle">
+            Converting terms and calculating document frequencies
+          </p>
+        </div>
+
+        <div class="pipeline-visual">
+          <div class="pipeline-step">
+            <div class="step-icon">1</div>
+            <div class="step-content">
+              <div class="step-name">Term to String</div>
+              <div class="step-description">
+                Convert term objects to string format
+              </div>
+            </div>
+          </div>
+          <div class="pipeline-step">
+            <div class="step-icon">2</div>
+            <div class="step-content">
+              <div class="step-name">GroupBy</div>
+              <div class="step-description">
+                Calculate how many documents contain each term
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">Document Frequency Examples:</h3>
+          <div class="code-box">
+            movi: appears in 1,247 documents (very common)<br />
+            great: appears in 876 documents (common)<br />
+            superb: appears in 134 documents (less common)<br />
+            darkheart: appears in 2 documents (very rare)<br />
+            breathtak: appears in 89 documents (moderately rare)
+          </div>
+          <p style="margin-top: 20px; color: #718096">
+            This helps identify which words are truly distinctive versus those
+            that appear everywhere.
+          </p>
+        </div>
+      </div>
+
+      <!-- Slide 11: Row Filter (Term Frequency) -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 11 of 20</div>
+          <h2 class="slide-title">🔍 Row Filter</h2>
+          <p class="slide-subtitle">
+            Filtering out rare and overly common words
+          </p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">Filtering Logic:</h3>
+          <div class="stats-grid" style="grid-template-columns: 1fr 1fr">
+            <div class="stat-card" style="border-color: #fc8181">
+              <div class="stat-label">Too Rare (Remove)</div>
+              <div class="stat-value" style="font-size: 24px; color: #fc8181">
+                < 5 docs
+              </div>
+              <p style="margin-top: 10px; font-size: 12px; color: #718096">
+                darkheart, hadley, kay
+              </p>
+            </div>
+            <div class="stat-card" style="border-color: #fc8181">
+              <div class="stat-label">Too Common (Remove)</div>
+              <div class="stat-value" style="font-size: 24px; color: #fc8181">
+                > 1500 docs
+              </div>
+              <p style="margin-top: 10px; font-size: 12px; color: #718096">
+                movi, film
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">Kept Words (Just Right!):</h3>
+          <div class="word-list">
+            <span
+              class="word-tag"
+              style="border-color: #68d391; background: #c6f6d5"
+              >great</span
+            >
+            <span
+              class="word-tag"
+              style="border-color: #68d391; background: #c6f6d5"
+              >superb</span
+            >
+            <span
+              class="word-tag"
+              style="border-color: #68d391; background: #c6f6d5"
+              >love</span
+            >
+            <span
+              class="word-tag"
+              style="border-color: #68d391; background: #c6f6d5"
+              >breathtak</span
+            >
+            <span
+              class="word-tag"
+              style="border-color: #68d391; background: #c6f6d5"
+              >convinc</span
+            >
+            <span class="word-tag">bad</span>
+            <span class="word-tag">poorli</span>
+            <span class="word-tag">corni</span>
+          </div>
+          <p style="margin-top: 20px; color: #718096">
+            These words appear frequently enough to be meaningful, but not so
+            common that they're useless!
+          </p>
+        </div>
+      </div>
+
+      <!-- Slide 12: TF (Term Frequency) -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 12 of 20</div>
+          <h2 class="slide-title">📊 TF (Term Frequency)</h2>
+          <p class="slide-subtitle">Calculating weighted term frequencies</p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">RAW COUNTS</div>
+            <div class="data-content" style="font-size: 13px">
+              great: 1<br />
+              superb: 1<br />
+              love: 1<br />
+              bad: 1<br />
+              poorli: 1
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">TF WEIGHTS</div>
+            <div class="data-content" style="font-size: 13px">
+              great: 0.05<br />
+              superb: 0.05<br />
+              love: 0.05<br />
+              bad: 0.05<br />
+              poorli: 0.05
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">How TF Works</div>
+          <div class="data-content">
+            <p>
+              Term Frequency (TF) normalizes word counts by the total number of
+              words in the document.
+            </p>
+            <p style="margin-top: 10px">
+              <strong>Formula:</strong> TF = (word count) / (total words in
+              document)
+            </p>
+            <p style="margin-top: 10px">
+              Each word that appears once gets a weight of approximately 0.05
+              (assuming ~20 total terms after filtering).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 13: Document Vector -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 13 of 20</div>
+          <h2 class="slide-title">🔢 Document Vector</h2>
+          <p class="slide-subtitle">
+            Converting words to numerical feature vector
+          </p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">From Words to Numbers</h3>
+          <div class="code-box">
+            Vocabulary (example positions):<br />
+            Position 0: "action"<br />
+            Position 1: "actor"<br />
+            Position 2: "bad"<br />
+            Position 3: "bear"<br />
+            Position 4: "breathtak"<br />
+            Position 5: "care"<br />
+            ...<br />
+            Position 45: "great"<br />
+            Position 46: "love"<br />
+            ...<br />
+            Position 89: "superb"<br />
+            ...<br />
+            <br />
+            <span style="color: #68d391">Our Review Vector:</span><br />
+            [0, 0, <span style="color: #68d391">0.05</span>,
+            <span style="color: #68d391">0.05</span>,
+            <span style="color: #68d391">0.05</span>,
+            <span style="color: #68d391">0.05</span>, 0, 0, ...,
+            <span style="color: #68d391">0.05</span>,
+            <span style="color: #68d391">0.05</span>, ...,
+            <span style="color: #68d391">0.05</span>, ...]<br />
+            <br />
+            Vector has ~5000 dimensions (one for each word in vocabulary)
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Why vectors?</div>
+          <div class="data-content">
+            Machine learning models need numbers! Each position represents a
+            specific word. A value of 0.05 means that word appears with that
+            frequency. Zero means the word isn't in our review.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 14: Category to Class -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 14 of 20</div>
+          <h2 class="slide-title">🏷️ Category to Class</h2>
+          <p class="slide-subtitle">
+            Converting sentiment labels to class format
+          </p>
+        </div>
+
+        <div class="data-flow">
+          <div class="data-box">
+            <div class="data-label">SENTIMENT LABEL</div>
+            <div class="data-content">
+              <span class="badge badge-success">POS</span>
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="data-box">
+            <div class="data-label">CLASS FORMAT</div>
+            <div class="data-content">
+              Class: 1 (Positive)<br />
+              <span style="font-size: 12px; color: #718096"
+                >0 = Negative, 1 = Positive</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Ready for Training!</div>
+          <div class="data-content">
+            <p>Now we have:</p>
+            <p style="margin-top: 10px">
+              <strong>✓ Feature Vector:</strong> [0, 0, 0.05, 0.05, 0.05, ...]
+            </p>
+            <p style="margin-top: 10px">
+              <strong>✓ Target Class:</strong> 1 (Positive)
+            </p>
+            <p
+              style="
+                margin-top: 15px;
+                padding: 15px;
+                background: #c6f6d5;
+                border-radius: 8px;
+                color: #22543d;
+              "
+            >
+              This pair of (features, label) is ready to train our machine
+              learning models!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 15: Table Partitioner -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 15 of 20</div>
+          <h2 class="slide-title">✂️ Table Partitioner</h2>
+          <p class="slide-subtitle">Splitting data for training and testing</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">2000</div>
+            <div class="stat-label">Total Reviews</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">1600</div>
+            <div class="stat-label">Training Set (80%)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">400</div>
+            <div class="stat-label">Testing Set (20%)</div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px">Where is Our Care Bears Review?</h3>
+          <div class="data-content">
+            <p
+              style="
+                padding: 15px;
+                background: #bee3f8;
+                border-radius: 8px;
+                color: #2c5282;
+              "
+            >
+              📍 Our Care Bears review goes into the
+              <strong>Testing Set</strong>!<br />
+              <span style="font-size: 14px; margin-top: 8px; display: block">
+                The model will train on 1,599 other reviews, then predict the
+                sentiment of our Care Bears review without having seen it during
+                training.
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Why split the data?</div>
+          <div class="data-content">
+            We train on 80% and test on 20% to evaluate how well the model
+            performs on completely new, unseen reviews - just like in the real
+            world!
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 16: Decision Tree Learning -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 16 of 20</div>
+          <h2 class="slide-title">🌳 Decision Tree Learner</h2>
+          <p class="slide-subtitle">
+            Training the first model on 1,600 reviews
+          </p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">Decision Tree Learning Process:</h3>
+          <div class="code-box">
+            <span style="color: #68d391">Training on 1,600 reviews...</span
+            ><br />
+            <br />
+            IF word "great" frequency > 0.03 THEN<br />
+            &nbsp;&nbsp;IF word "love" frequency > 0.02 THEN<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #68d391"
+              >→ Predict POSITIVE (confidence: 0.89)</span
+            ><br />
+            &nbsp;&nbsp;ELSE IF word "bad" frequency > 0.04 THEN<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #fc8181"
+              >→ Predict NEGATIVE</span
+            ><br />
+            &nbsp;&nbsp;ELSE<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #68d391"
+              >→ Predict POSITIVE (confidence: 0.76)</span
+            ><br />
+            ELSE IF word "poor" frequency > 0.05 THEN<br />
+            &nbsp;&nbsp;<span style="color: #fc8181">→ Predict NEGATIVE</span
+            ><br />
+            ...<br />
+            <br />
+            <span style="color: #68d391">✓ Model Trained!</span>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">How the tree learns</div>
+          <div class="data-content">
+            The model identifies which words and word frequencies best separate
+            positive from negative reviews. It creates a tree of decisions based
+            on patterns in the 1,600 training reviews.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 17: XGBoost Learning -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 17 of 20</div>
+          <h2 class="slide-title">🚀 XGBoost Tree Ensemble Learner</h2>
+          <p class="slide-subtitle">Training the advanced ensemble model</p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">XGBoost Training Process</h3>
+          <div class="pipeline-visual">
+            <div class="pipeline-step">
+              <div class="step-icon">1</div>
+              <div class="step-content">
+                <div class="step-name">Tree 1</div>
+                <div class="step-description">
+                  Learns from all 1,600 training reviews
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">2</div>
+              <div class="step-content">
+                <div class="step-name">Tree 2</div>
+                <div class="step-description">
+                  Focuses on reviews Tree 1 got wrong
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">3</div>
+              <div class="step-content">
+                <div class="step-name">Tree 3</div>
+                <div class="step-description">
+                  Corrects remaining errors from Trees 1 & 2
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">...</div>
+              <div class="step-content">
+                <div class="step-name">Trees 4-100</div>
+                <div class="step-description">
+                  Continue improving and refining predictions
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="data-label">Power of Boosting</div>
+          <div class="data-content">
+            XGBoost builds 100+ trees that work together. Each tree learns from
+            previous trees' mistakes. The final prediction combines votes from
+            all trees, making it more accurate than a single decision tree!
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 18: Making Predictions -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 18 of 20</div>
+          <h2 class="slide-title">🎯 Making Predictions</h2>
+          <p class="slide-subtitle">Testing on our Care Bears review</p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">Care Bears Review Analysis</h3>
+          <div class="code-box">
+            <span style="color: #68d391">Key Positive Words Found:</span><br />
+            ✓ "great" (frequency: 0.05)<br />
+            ✓ "superb" (frequency: 0.05)<br />
+            ✓ "love" (frequency: 0.05)<br />
+            ✓ "breathtak" (frequency: 0.05)<br />
+            ✓ "convinc" (frequency: 0.05)<br />
+            <br />
+            <span style="color: #fc8181">Key Negative Words Found:</span><br />
+            ✗ "bad" (frequency: 0.05)<br />
+            ✗ "poorli" (frequency: 0.05)<br />
+            ✗ "corni" (frequency: 0.05)<br />
+            <br />
+            <span style="color: #a0aec0"
+              >Positive words outweigh negative: 5 vs 3</span
+            >
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Decision Tree Prediction</div>
+            <div style="margin-top: 10px">
+              <span
+                class="badge badge-success"
+                style="font-size: 18px; padding: 10px 20px"
+                >POSITIVE</span
+              >
+              <div
+                style="
+                  margin-top: 10px;
+                  color: #667eea;
+                  font-size: 20px;
+                  font-weight: bold;
+                "
+              >
+                88%
+              </div>
+              <div style="font-size: 12px; color: #718096">confidence</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">XGBoost Prediction</div>
+            <div style="margin-top: 10px">
+              <span
+                class="badge badge-success"
+                style="font-size: 18px; padding: 10px 20px"
+                >POSITIVE</span
+              >
+              <div
+                style="
+                  margin-top: 10px;
+                  color: #48bb78;
+                  font-size: 20px;
+                  font-weight: bold;
+                "
+              >
+                93%
+              </div>
+              <div style="font-size: 12px; color: #718096">confidence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 19: Evaluation Results -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 19 of 20</div>
+          <h2 class="slide-title">📊 Model Evaluation</h2>
+          <p class="slide-subtitle">
+            Scoring both models on all 400 test reviews
+          </p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px; text-align: center">
+            Decision Tree Results
+          </h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">91.7%</div>
+              <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">0.92</div>
+              <div class="stat-label">Precision</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">0.91</div>
+              <div class="stat-label">Recall</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">0.92</div>
+              <div class="stat-label">ROC AUC</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px; text-align: center">
+            XGBoost Results
+          </h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" style="color: #48bb78">94%</div>
+              <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: #48bb78">0.95</div>
+              <div class="stat-label">Precision</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: #48bb78">0.93</div>
+              <div class="stat-label">Recall</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: #48bb78">0.95</div>
+              <div class="stat-label">ROC AUC</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box" style="text-align: center">
+          <div class="data-label">Verdict</div>
+          <div class="data-content">
+            <p style="font-size: 20px; color: #48bb78; font-weight: bold">
+              🏆 XGBoost is the winner with 94% accuracy!
+            </p>
+            <p style="margin-top: 10px; color: #718096">
+              That's 376 correct predictions out of 400 test reviews
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 20: Care Bears Final Result -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-number">Step 20 of 20</div>
+          <h2 class="slide-title">🐻 Care Bears Review - Final Result</h2>
+          <p class="slide-subtitle">Complete journey through the pipeline</p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 20px">Transformation Journey</h3>
+          <div class="pipeline-visual">
+            <div class="pipeline-step">
+              <div class="step-icon">📄</div>
+              <div class="step-content">
+                <div class="step-name">Original Review</div>
+                <div class="step-description">
+                  "Care Bears Movie 2: A New Generation isn't at all a bad
+                  movie. In fact, I like it very much..."
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">🧹</div>
+              <div class="step-content">
+                <div class="step-name">After Preprocessing</div>
+                <div class="step-description">
+                  "care bear movi new generat bad movi fact like dialogu corni
+                  stori poorli told darkheart dark convinc great superb love
+                  breathtak"
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">🔢</div>
+              <div class="step-content">
+                <div class="step-name">Feature Vector</div>
+                <div class="step-description">
+                  [0, 0, 0.05, 0.05, 0.05, 0.05, 0, ..., 0.05, 0.05, ...]
+                </div>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-icon">🤖</div>
+              <div class="step-content">
+                <div class="step-name">Model Predictions</div>
+                <div class="step-description">
+                  Decision Tree: 88% confident POSITIVE | XGBoost: 93% confident
+                  POSITIVE
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="content-box"
+          style="
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border-color: #48bb78;
+          "
+        >
+          <h3 style="margin-bottom: 20px; text-align: center; color: #22543d">
+            ✅ Final Verdict
+          </h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: 20px;
+              text-align: center;
+            "
+          >
+            <div>
+              <div
+                style="
+                  font-size: 14px;
+                  color: #22543d;
+                  font-weight: bold;
+                  margin-bottom: 10px;
+                "
+              >
+                TRUE SENTIMENT
+              </div>
+              <span
+                class="badge badge-success"
+                style="font-size: 18px; padding: 10px 20px"
+                >POSITIVE</span
+              >
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 14px;
+                  color: #22543d;
+                  font-weight: bold;
+                  margin-bottom: 10px;
+                "
+              >
+                DECISION TREE
+              </div>
+              <span
+                class="badge badge-success"
+                style="font-size: 18px; padding: 10px 20px"
+                >POSITIVE</span
+              >
+              <div style="margin-top: 5px; font-size: 12px; color: #22543d">
+                88% ✓
+              </div>
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 14px;
+                  color: #22543d;
+                  font-weight: bold;
+                  margin-bottom: 10px;
+                "
+              >
+                XGBOOST
+              </div>
+              <span
+                class="badge badge-success"
+                style="font-size: 18px; padding: 10px 20px"
+                >POSITIVE</span
+              >
+              <div style="margin-top: 5px; font-size: 12px; color: #22543d">
+                93% ✓
+              </div>
+            </div>
+          </div>
+          <p
+            style="
+              margin-top: 30px;
+              text-align: center;
+              font-size: 24px;
+              color: #22543d;
+              font-weight: bold;
+            "
+          >
+            🎉 Both models correctly predicted POSITIVE sentiment!
+          </p>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-bottom: 15px; color: #667eea">🔑 Key Takeaways</h3>
+          <div class="data-content">
+            <p>
+              ✓ Despite some negative words ("bad", "corny", "poorly"), the
+              review contains more positive sentiment words
+            </p>
+            <p style="margin-top: 10px">
+              ✓ Words like "superb", "great", "love", and "breathtaking"
+              strongly signal positive sentiment
+            </p>
+            <p style="margin-top: 10px">
+              ✓ The 8/10 rating confirms it's a positive review
+            </p>
+            <p style="margin-top: 10px">
+              ✓ XGBoost was more confident (93%) than Decision Tree (88%)
+              because it combines multiple models
+            </p>
+            <p style="margin-top: 10px">
+              ✓ Both models successfully learned to identify positive sentiment
+              from the training data!
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="content-box"
+          style="
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+          "
+        >
+          <h3 style="color: white; margin-bottom: 15px">🎓 Congratulations!</h3>
+          <p style="font-size: 18px">
+            You've completed the NLP sentiment analysis pipeline journey!
+          </p>
+          <p style="font-size: 14px; margin-top: 10px; opacity: 0.9">
+            From raw text to accurate predictions - you now understand each
+            step!
+          </p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-secondary" id="prevBtn" disabled>
+          ← Previous
+        </button>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <button class="btn btn-primary" id="nextBtn">Next →</button>
+      </div>
+    </div>
+
+    <script>
+      let currentSlide = 0;
+      const slides = document.querySelectorAll(".slide");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const progressFill = document.getElementById("progressFill");
+      const totalSlides = slides.length;
+
+      function showSlide(n) {
+        slides.forEach((slide) => slide.classList.remove("active"));
+        slides[n].classList.add("active");
+
+        const progress = ((n + 1) / totalSlides) * 100;
+        progressFill.style.width = progress + "%";
+
+        prevBtn.disabled = n === 0;
+        nextBtn.disabled = n === totalSlides - 1;
+
+        if (n === totalSlides - 1) {
+          nextBtn.textContent = "Restart 🔄";
+          nextBtn.disabled = false;
+        } else {
+          nextBtn.textContent = "Next →";
+        }
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentSlide > 0) {
+          currentSlide--;
+          showSlide(currentSlide);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentSlide < totalSlides - 1) {
+          currentSlide++;
+          showSlide(currentSlide);
+        } else {
+          currentSlide = 0;
+          showSlide(currentSlide);
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft" && currentSlide > 0) {
+          currentSlide--;
+          showSlide(currentSlide);
+        } else if (e.key === "ArrowRight" && currentSlide < totalSlides - 1) {
+          currentSlide++;
+          showSlide(currentSlide);
+        }
+      });
+
+      showSlide(0);
+    </script>
+  </body>
+</html>
